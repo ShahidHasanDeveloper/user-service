@@ -9,6 +9,7 @@ import javax.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,20 +27,26 @@ import com.epam.users.exceptions.UserExistsException;
 import com.epam.users.exceptions.UserNotFoundException;
 import com.epam.users.services.UserService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @Validated
+@Api(tags="User Management RESTful Services", description="Controller for user service")
 public class UserController {
 
 	@Autowired
 	private UserService userService;
 
-
-	@GetMapping("/users")
+	
+	@GetMapping(value="/users", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "List of all users")
 	public List<User> getAllUsers(){
 		return userService.getAllUsers();
 	}
 
-	@PostMapping("/users")
+	@PostMapping(value="/users",consumes=MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Add a user")
 	public ResponseEntity<Void> createUser(@Valid @RequestBody User user, UriComponentsBuilder builder) throws UserExistsException {
 		
 			User createdUser= userService.createUser(user);
@@ -49,10 +56,12 @@ public class UserController {
 
 	}
 
-	@GetMapping("/users/{user_id}")
-	public Optional<User> getUserById(@PathVariable("user_id")  @Min(1) Long id){
+	@GetMapping(value="/users/{user_id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Get user by id")
+	public User getUserById(@PathVariable("user_id")  @Min(1) Long id){
 		try {
-			return userService.getUserById(id);
+			Optional<User>optionalUser=userService.getUserById(id);
+			return optionalUser.get();
 		} catch(UserNotFoundException e) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
 		}
@@ -60,7 +69,8 @@ public class UserController {
 	}
 
 
-	@PutMapping("/users/{user_id}") 
+	@PutMapping(value="/users/{user_id}", produces = MediaType.APPLICATION_JSON_VALUE) 
+	@ApiOperation(value = "Update a user")
 	public User updateUserById(@PathVariable("user_id") Long id, @RequestBody User user) {
 		try {
 			return userService.updateUserById(id, user);
@@ -70,6 +80,7 @@ public class UserController {
 	}
 
 	@DeleteMapping("/users/{user_id}")
+	@ApiOperation(value = "Delete a user")
 	public void deleteUserById(@PathVariable("user_id") Long id ) {
 		userService.deleteUserById(id);
 	}
