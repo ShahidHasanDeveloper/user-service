@@ -1,12 +1,12 @@
 spring:
   jpa:
     show-sql: true
-    hibernate:      ddl-auto: create-drop
+    hibernate:      ddl-auto: update
   h2:    console:      enabled: true
    
-  datasource:    url: jdbc:h2:mem:testdb
-    
+  datasource:    url: jdbc:mysql://localhost:3306/userdb    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: Epam1234$
 
 server:  error:    include-message: ALWAYS
-    
     
