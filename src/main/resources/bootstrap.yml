@@ -1,22 +1,11 @@
 spring:
-  jpa:
-    show-sql: true
-    hibernate:      ddl-auto: update
-  h2:    console:      enabled: true
-   
-  datasource:    url: jdbc:mysql://localhost:3306/userdb    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: Epam1234$
-
-server:  error:    include-message: ALWAYS
-
-swagger:
-  ui:
-    title: EPAM User Management Service
-    description: This page list all API's of User Management
-    version: "1.0"
-    contactname: Shahid Hasan
-    contacturl: https://www.epam.com
-    contactemail: shahid_hasan@epam.com
-    licence: Licence 2.0
-    licenceurl: https://www.epam.com/licence.html    
+  application:
+    name: userservice
+  profiles:    active:    - default
+  cloud:    config:      uri:      - http://localhost:8088
+      enabled: true
+      
+eureka:  instance:    prefer-ip-address: true
+  client:    register-with-eureka: true
+    fetch-registry: true
+    service-url:      defaultzone: http://localhost:8761/eureka
