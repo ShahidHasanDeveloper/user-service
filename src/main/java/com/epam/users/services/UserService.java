@@ -1,5 +1,6 @@
 package com.epam.users.services;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,7 @@ import com.epam.users.entities.User;
 import com.epam.users.exceptions.UserExistsException;
 import com.epam.users.exceptions.UserNotFoundException;
 import com.epam.users.repositories.UserRepository;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 @Service
 public class UserService {
@@ -19,11 +21,12 @@ public class UserService {
 	@Autowired
 	private UserRepository userRepository;
 
-
+	@HystrixCommand(fallbackMethod = "fallbackGetAllUsers")
 	public List<User> getAllUsers(){
 		return userRepository.findAll();
 	}
 
+	@HystrixCommand
 	public User createUser(User user) throws UserExistsException {
 		Optional<User>userFoundByUsername= userRepository.findByUsername(user.getUsername());
 		Optional<User>userFoundBySsn= userRepository.findBySsn(user.getSsn());
@@ -37,6 +40,7 @@ public class UserService {
 		return userRepository.save(user);
 	}
 
+	@HystrixCommand
 	public Optional<User> getUserById(Long id) throws UserNotFoundException {
 
 		Optional<User> user=  userRepository.findById(id);
@@ -47,6 +51,7 @@ public class UserService {
 
 	}
 
+	@HystrixCommand
 	public User updateUserById(Long id, User user) throws UserNotFoundException{
 		Optional<User> optionalUser=  userRepository.findById(id);
 		if(!optionalUser.isPresent()) {
@@ -56,6 +61,7 @@ public class UserService {
 		return userRepository.save(user);
 	}
 
+	@HystrixCommand
 	public void deleteUserById(Long id) throws ResponseStatusException {
 		Optional<User> optionalUser=  userRepository.findById(id);
 		if(!optionalUser.isPresent()) {
@@ -64,5 +70,16 @@ public class UserService {
 		userRepository.deleteById(id);
 
 
+	}
+	
+	public List<User> fallbackGetAllUsers(){
+		User user= new User();
+		user.setEmail("Unknown");
+		user.setUsername("Uknown");
+		user.setFirstname("Unknown");
+		user.setLastname("Unknown");
+		user.setRole("Uknown");
+		user.setSsn("Uknown");
+		return Collections.singletonList(user);
 	}
 }
