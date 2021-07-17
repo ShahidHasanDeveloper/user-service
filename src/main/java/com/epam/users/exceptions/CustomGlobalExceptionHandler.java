@@ -48,7 +48,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
 
 	@ExceptionHandler(value = UserExistsException.class)
-	public final ResponseEntity<Object>handleUserNotFoundException(
+	public final ResponseEntity<Object>handleUserExitsException(
 			UserExistsException ex, WebRequest request){
 		
 		CustomErrorDetails customErrors= new CustomErrorDetails(new Date(), "User is already present ", ex.getMessage());
