@@ -1,9 +1,12 @@
 package com.epam.users.exceptions;
-
+import static com.epam.users.common.UserConstants.TRACE_ID;
 import java.util.Date;
 
 import javax.validation.ConstraintViolationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +21,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler{
 
-
+	private final Logger logger = LoggerFactory.getLogger(CustomGlobalExceptionHandler.class);
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(
 			MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-
-		CustomErrorDetails customErrors= new CustomErrorDetails(new Date(), "Method Argument  is not valid ", ex.getMessage());
+		logger.error("CustomGlobalExceptionHandler | handleMethodArgumentNotValid | exception {} " +ex.getCause());
+		CustomErrorDetails customErrors= new CustomErrorDetails(new Date(), "Method Argument  is not valid ", ex.getMessage(), MDC.get(TRACE_ID));
 		return new ResponseEntity<Object>(customErrors, HttpStatus.BAD_REQUEST);
 	}
 
@@ -32,8 +35,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 	protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(
 			HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-
-		CustomErrorDetails customErrors= new CustomErrorDetails(new Date(), "Http Media type is not supported ", ex.getMessage());
+		logger.error("CustomGlobalExceptionHandler | handleHttpMediaTypeNotSupported | exception {} " +ex.getCause());
+		CustomErrorDetails customErrors= new CustomErrorDetails(new Date(), "Http Media type is not supported ", ex.getMessage(),MDC.get(TRACE_ID));
 		return new ResponseEntity<Object>(customErrors, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 	}
 
@@ -41,8 +44,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
 			HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-
-		CustomErrorDetails customErrors= new CustomErrorDetails(new Date(), "Http Method is not supported ", ex.getMessage());
+		logger.error("CustomGlobalExceptionHandler | handleHttpRequestMethodNotSupported | exception {} " +ex.getCause());
+		CustomErrorDetails customErrors= new CustomErrorDetails(new Date(), "Http Method is not supported ", ex.getMessage(),MDC.get(TRACE_ID));
 		return new ResponseEntity<Object>(customErrors, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
@@ -50,16 +53,16 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 	@ExceptionHandler(value = UserExistsException.class)
 	public final ResponseEntity<Object>handleUserExitsException(
 			UserExistsException ex, WebRequest request){
-		
-		CustomErrorDetails customErrors= new CustomErrorDetails(new Date(), "User is already present ", ex.getMessage());
+		logger.error("CustomGlobalExceptionHandler | handleUserExitsException | exception {} " +ex.getCause());
+		CustomErrorDetails customErrors= new CustomErrorDetails(new Date(), "User is already present ", ex.getMessage(),MDC.get(TRACE_ID));
 		return new ResponseEntity<Object>(customErrors, HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(ConstraintViolationException.class)
 	public final ResponseEntity<Object> hanldeConstraintViolationException(ConstraintViolationException ex, WebRequest request){
-		
-		CustomErrorDetails customErrors= new CustomErrorDetails(new Date(), "Constraint is violated", ex.getMessage());
+		logger.error("CustomGlobalExceptionHandler | hanldeConstraintViolationException | exception {} " +ex.getCause());
+		CustomErrorDetails customErrors= new CustomErrorDetails(new Date(), "Constraint is violated", ex.getMessage(),MDC.get(TRACE_ID));
 		return new ResponseEntity<Object>(customErrors, HttpStatus.BAD_REQUEST);
 	}
-	
+
 }

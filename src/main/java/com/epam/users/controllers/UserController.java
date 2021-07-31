@@ -6,6 +6,8 @@ import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,6 +36,8 @@ import io.swagger.annotations.ApiOperation;
 @Validated
 @Api(tags="User Management RESTful Services", description="Controller for user service")
 public class UserController {
+	
+	private final Logger logger = LoggerFactory.getLogger(UserController.class);
 
 	@Autowired
 	private UserService userService;
@@ -63,6 +67,7 @@ public class UserController {
 			Optional<User>optionalUser=userService.getUserById(id);
 			return optionalUser.get();
 		} catch(UserNotFoundException e) {
+			logger.error("UserController | getUserById | User Not found "+e.getCause());
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
 		}
 
@@ -75,6 +80,7 @@ public class UserController {
 		try {
 			return userService.updateUserById(id, user);
 		} catch (UserNotFoundException e) {
+			logger.error("UserController | updateUserById | User Not found "+e.getCause());
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
