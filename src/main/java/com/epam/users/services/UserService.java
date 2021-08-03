@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,7 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 @Service
 public class UserService {
-
+	private final Logger logger= LoggerFactory.getLogger(UserService.class);
 	@Autowired
 	private UserRepository userRepository;
 
@@ -32,9 +34,11 @@ public class UserService {
 		Optional<User>userFoundBySsn= userRepository.findBySsn(user.getSsn());
 
 		if(userFoundByUsername.isPresent()) {
+			logger.info("UserService | createUser | User is already present with given user nam");
 			throw new UserExistsException("User is already present with given user name");
 		}
 		else if(userFoundBySsn.isPresent()) {
+			logger.info("UserService | createUser | User is already present with given ssn");
 			throw new UserExistsException("User is already present with given ssn");
 		}
 		return userRepository.save(user);
@@ -45,6 +49,7 @@ public class UserService {
 
 		Optional<User> user=  userRepository.findById(id);
 		if(!user.isPresent()) {
+			logger.info("UserService | getUserById | User not found");
 			throw new UserNotFoundException("User not found");
 		}
 		return user;
@@ -55,6 +60,7 @@ public class UserService {
 	public User updateUserById(Long id, User user) throws UserNotFoundException{
 		Optional<User> optionalUser=  userRepository.findById(id);
 		if(!optionalUser.isPresent()) {
+			logger.info("UserService | updateUserById | User not found for given user id for update");
 			throw new UserNotFoundException("User not found for given user id for update");
 		}
 		user.setId(id);
@@ -65,6 +71,7 @@ public class UserService {
 	public void deleteUserById(Long id) throws ResponseStatusException {
 		Optional<User> optionalUser=  userRepository.findById(id);
 		if(!optionalUser.isPresent()) {
+			logger.info("UserService | deleteUserById | User not found for given user id for delete");
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User not found for given user id for delete");
 		}
 		userRepository.deleteById(id);
@@ -73,6 +80,7 @@ public class UserService {
 	}
 	
 	public List<User> fallbackGetAllUsers(){
+		logger.info("UserService | fallbackGetAllUsers | serving from fallback implementation");
 		User user= new User();
 		user.setEmail("Unknown");
 		user.setUsername("Uknown");
