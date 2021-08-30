@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import javax.management.relation.Role;
+
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +66,17 @@ public class UserService {
 			logger.info("UserService | updateUserById | User not found for given user id for update");
 			throw new UserNotFoundException("User not found for given user id for update");
 		}
-		user.setId(id);
+		
+		user = User.builder()
+				.username(Strings.isBlank(user.getUsername())?optionalUser.get().getUsername():user.getUsername())
+				.firstname(Strings.isBlank(user.getFirstname())?optionalUser.get().getFirstname():user.getFirstname())
+				.lastname(Strings.isBlank(user.getLastname())?optionalUser.get().getLastname():user.getLastname())
+				.email(Strings.isBlank(user.getEmail())?optionalUser.get().getEmail():user.getEmail())
+				.role(Strings.isBlank(user.getRole())?optionalUser.get().getRole():user.getRole())
+				.ssn(Strings.isBlank(user.getSsn())?optionalUser.get().getSsn():user.getSsn())
+				.build();
+		user.setId(id);	
+		
 		return userRepository.save(user);
 	}
 

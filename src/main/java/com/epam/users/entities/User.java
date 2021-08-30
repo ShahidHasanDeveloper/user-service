@@ -10,13 +10,18 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 import io.swagger.annotations.ApiModel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Table(name="user")
 @ApiModel(description = "This model is to create a user")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 	
 	@Id
